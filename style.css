@@ -21,18 +21,18 @@ body {
 }
 
 h1 {
-    font-size: 2.5rem;
-    margin-bottom: 50px;
+    font-size: 2.5dvw;
+    margin-bottom: 2dvh;
 }
 
 .countdown {
     display: flex;
     justify-content: center;
-    gap: 40px;
+    gap: 2vw;
 }
 
 .time {
-    padding: 20px;
+    padding: 1vw 2vw;
 }
 
 .time span {
@@ -41,18 +41,18 @@ h1 {
 }
 
 #months, #weeks, #days, #hours, #minutes, #seconds {
-    font-size: 3rem;
+    font-size: 3dvw;
     font-weight: 700;
 }
 
 .label {
-    font-size: 1rem;
+    font-size: 1dvw;
     color: #fff8;
 }
 
 .snowflake {
     color: #fff;
-    font-size: 1em;
+    font-size: 1dvw;
     font-family: Arial, sans-serif;
 }
 
@@ -67,7 +67,7 @@ h1 {
     width: 100%;
     text-align: center;
     color: #fff8;
-    font-size: 0.9rem;
+    font-size: 0.9dvw;
     background-color: transparent;
 }
 
@@ -81,5 +81,8 @@ h1 {
     width: 110%;
     height: 110%;
     opacity: .5;
-    filter: blur(1em);
+    filter: blur(1vw);
+
+    background-size: cover;
+    background-position: center center;
 }
