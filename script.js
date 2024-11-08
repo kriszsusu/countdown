@@ -19,7 +19,7 @@ function getNextBreak() {
     const currentYear = now.getFullYear();
 
     const upcomingBreaks = breaksData.map(breakInfo => {
-        let breakDate = new Date(currentYear, breakInfo.month, breakInfo.day);
+        let breakDate = new Date(currentYear, breakInfo.month, breakInfo.day, 13, 40);
         if (breakDate < now) {
             breakDate = new Date(currentYear + 1, breakInfo.month, breakInfo.day);
         }
@@ -30,10 +30,34 @@ function getNextBreak() {
     return upcomingBreaks[0];
 }
 
+function getPreviousBreak() {
+    const now = new Date();
+    const currentYear = now.getFullYear();
+
+    const previousBreaks = breaksData.map(breakInfo => {
+        let breakDate = new Date(currentYear, breakInfo.month, breakInfo.day, 13, 40);
+        if (breakDate > now) {
+            breakDate = new Date(currentYear - 1, breakInfo.month, breakInfo.day, 13, 40);
+        }
+        return { name: breakInfo.name, date: breakDate };
+    });
+
+    previousBreaks.sort((a, b) => b.date - a.date);
+
+    return previousBreaks[0];
+}
+
+const previousBreak = getPreviousBreak();
 const nextBreak = getNextBreak();
+const breakEndDate = new Date(previousBreak.date);
+breakEndDate.setDate(breakEndDate.getDate() + 7);
+
 titleElement.innerText = `${String(nextBreak.name).charAt(0).toUpperCase() + String(nextBreak.name).slice(1)} szünetig hátralevő idő`;
 
-if (nextBreak.name == "téli") document.querySelector(".snowflakes").style.display = "block";
+const now = new Date().getTime();
+const breakOngoing = (breakEndDate - now) > 0;
+
+if (nextBreak.name == "téli" || (breakOngoing && previousBreak.name == "téli")) document.querySelector(".snowflakes").style.display = "block";
 
 const images = {
     "őszi": [
@@ -62,14 +86,34 @@ const images = {
     ]
 };
 
-const seasonImages = images[nextBreak.name];
-const randomImage = seasonImages[Math.floor(Math.random() * seasonImages.length)];
+let seasonImages, randomImage;
+
+seasonImages = images[nextBreak.name];
+randomImage = seasonImages[Math.floor(Math.random() * seasonImages.length)];
 
 document.querySelector(".background").style.backgroundImage = `url(https://susu.liba.lol/countdown/backgrounds/${randomImage})`;
+
+if(breakOngoing) {
+    seasonImages = images[previousBreak.name];
+    randomImage = seasonImages[Math.floor(Math.random() * seasonImages.length)];
+
+    document.querySelector(".background").style.backgroundImage = `url(https://susu.liba.lol/countdown/backgrounds/${randomImage})`;
+    titleElement.innerText = `${String(previousBreak.name).charAt(0).toUpperCase() + String(previousBreak.name).slice(1)} szünetig hátralevő idő`;
+}
 
 function updateCountdown() {
     const now = new Date().getTime();
     const distance = nextBreak.date.getTime() - now;
+
+    if (breakOngoing) {
+        document.querySelector('.countdown').innerHTML = `
+            <div class="time">
+                <span id="seconds">🎉</span>
+                <span class="label">${String(previousBreak.name).charAt(0).toUpperCase() + String(previousBreak.name).slice(1)} szünet van!</span>
+            </div>
+        `;
+        return;
+    }
 
     const totalSeconds = Math.floor(distance / 1000);
 
@@ -87,19 +131,19 @@ function updateCountdown() {
     const seconds = Math.floor(totalSeconds % secondsInMinute);
 
     monthsElement.innerText = months.toString().padStart(2, '0');
-    monthsElement.style.display = months > 0 ? "inline" : "none";
+    document.querySelector(".months").style.display = months > 0 ? "inline" : "none";
 
     weeksElement.innerText = weeks.toString().padStart(2, '0');
-    weeksElement.style.display = (weeks > 0 || months > 0) ? "inline" : "none";
+    document.querySelector(".weeks").style.display = (weeks > 0 || months > 0) ? "inline" : "none";
 
     daysElement.innerText = days.toString().padStart(2, '0');
-    daysElement.style.display = (days > 0 || weeks > 0 || months > 0) ? "inline" : "none";
+    document.querySelector(".days").style.display = (days > 0 || weeks > 0 || months > 0) ? "inline" : "none";
 
     hoursElement.innerText = hours.toString().padStart(2, '0');
-    hoursElement.style.display = (hours > 0 || days > 0 || weeks > 0 || months > 0) ? "inline" : "none";
+    document.querySelector(".hours").style.display = (hours > 0 || days > 0 || weeks > 0 || months > 0) ? "inline" : "none";
 
     minutesElement.innerText = minutes.toString().padStart(2, '0');
-    minutesElement.style.display = (minutes > 0 || hours > 0 || days > 0 || weeks > 0 || months > 0) ? "inline" : "none";
+    document.querySelector(".minutes").style.display = (minutes > 0 || hours > 0 || days > 0 || weeks > 0 || months > 0) ? "inline" : "none";
 
     secondsElement.innerText = seconds.toString().padStart(2, '0');
 
