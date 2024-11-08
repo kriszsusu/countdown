@@ -8,10 +8,10 @@ const secondsElement = document.getElementById('seconds');
 const titleElement = document.getElementById('title');
 
 const breaksData = [
-    { name: "őszi", month: 9, day: 25 },    // október 25 
-    { name: "téli", month: 11, day: 20 },   // december 20
-    { name: "tavaszi", month: 3, day: 16 }, // április 16
-    { name: "nyári", month: 5, day: 13 }    // június 13
+    { name: "őszi", month: 9, day: 25, emoji: "🍁" },    // október 25 
+    { name: "téli", month: 11, day: 20, emoji: "❅" },    // december 20
+    { name: "tavaszi", month: 3, day: 16, emoji: "🌸" }, // április 16
+    { name: "nyári", month: 5, day: 13, emoji: "" }       // június 13
 ];
 
 function getNextBreak() {
@@ -23,7 +23,7 @@ function getNextBreak() {
         if (breakDate < now) {
             breakDate = new Date(currentYear + 1, breakInfo.month, breakInfo.day);
         }
-        return { name: breakInfo.name, date: breakDate };
+        return { name: breakInfo.name, date: breakDate, emoji: breakInfo.emoji };
     });
 
     upcomingBreaks.sort((a, b) => a.date - b.date);
@@ -39,7 +39,7 @@ function getPreviousBreak() {
         if (breakDate > now) {
             breakDate = new Date(currentYear - 1, breakInfo.month, breakInfo.day, 13, 40);
         }
-        return { name: breakInfo.name, date: breakDate };
+        return { name: breakInfo.name, date: breakDate, emoji: breakInfo.emoji };
     });
 
     previousBreaks.sort((a, b) => b.date - a.date);
@@ -56,8 +56,6 @@ titleElement.innerText = `${String(nextBreak.name).charAt(0).toUpperCase() + Str
 
 const now = new Date().getTime();
 const breakOngoing = (breakEndDate - now) > 0;
-
-if (nextBreak.name == "téli" || (breakOngoing && previousBreak.name == "téli")) document.querySelector(".snowflakes").style.display = "block";
 
 const images = {
     "őszi": [
@@ -99,6 +97,10 @@ if(breakOngoing) {
 
     document.querySelector(".background").style.backgroundImage = `url(https://susu.liba.lol/countdown/backgrounds/${randomImage})`;
     titleElement.innerText = `${String(previousBreak.name).charAt(0).toUpperCase() + String(previousBreak.name).slice(1)} szünetig hátralevő idő`;
+
+    generateFlakes(previousBreak.emoji);
+} else {
+    generateFlakes(nextBreak.emoji);
 }
 
 function updateCountdown() {
@@ -157,6 +159,25 @@ function updateCountdown() {
         clearInterval(countdownInterval);
         return;
     }
+}
+
+function generateFlakes(emoji = '') {
+    const container = document.createElement("div");
+    container.classList.add("snowflakes");
+
+    for (let i = 0; i < 12; i++) {
+        const flakeContainer = document.createElement("div"); 
+        const flakeInner = document.createElement("div"); 
+
+        flakeContainer.classList.add("snowflake");
+        flakeInner.classList.add("inner");
+        flakeInner.innerHTML = emoji;
+
+        flakeContainer.appendChild(flakeInner);
+        container.appendChild(flakeContainer);
+    }
+
+    document.body.appendChild(container);
 }
 
 updateCountdown();
